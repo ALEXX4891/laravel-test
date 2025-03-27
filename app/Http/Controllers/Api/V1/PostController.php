@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Http\Resources\Api\V1\PostResource;
 
 class PostController extends Controller
 {
@@ -14,7 +15,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        return Post::all();
+        // return PostResource::collection(Post::all());
+        return PostResource::collection(Post::with('category')->paginate(5));
+
     }
 
     /**
@@ -22,7 +25,7 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        return Post::create($request->all());
+        return new PostResource(Post::create($request->all()));
     }
 
     /**
@@ -30,12 +33,13 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        if ($post->id == 3) { // пост с id 3 не показываем
-            return response()->json([
-                'message' => 'Post with ID 3 is not allowed'
-            ], 403);
-        }
-        return $post;
+        // if ($post->id == 3) { // пост с id 3 не показываем
+        //     return response()->json([
+        //         'message' => 'Post with ID 3 is not allowed'
+        //     ], 403);
+        // }
+        // return $post;
+        return new PostResource($post);
     }
 
     /**
@@ -44,7 +48,8 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post)
     {
         $post->update($request->all());
-        return $post;
+        // return $post;
+        return new PostResource($post);
     }
 
     /**
